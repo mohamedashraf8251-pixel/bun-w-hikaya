@@ -22,7 +22,7 @@ header p{margin:0;max-width:30em;font-size:1.1rem;opacity:.9}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;gap:8px;overflow-x:auto;padding:12px 24px;scrollbar-width:none}
 #navrow{align-items:center}
-#loginBtn{font:inherit;font-weight:700;white-space:nowrap;cursor:pointer;background:var(--accent);color:var(--hero);border:0;border-radius:999px;padding:6px 16px}
+#signupTop{font:inherit;font-weight:700;white-space:nowrap;cursor:pointer;background:transparent;color:var(--ink);border:1.5px solid var(--accent);border-radius:999px;padding:6px 14px}\n#loginBtn{font:inherit;font-weight:700;white-space:nowrap;cursor:pointer;background:var(--accent);color:var(--hero);border:0;border-radius:999px;padding:6px 16px}
 #tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex:1}
 nav button{font:inherit;font-weight:500;white-space:nowrap;cursor:pointer;background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 18px}
 nav button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -64,7 +64,7 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 <p class="hours">كل يوم من ٨ صباحًا حتى ١٢ منتصف الليل</p>
 </div></header>
 
-<nav aria-label="أقسام المينيو"><div class="wrap" id="navrow"><button id="loginBtn" type="button">🔐 تسجيل الدخول</button><div id="tabs"></div></div></nav>
+<nav aria-label="أقسام المينيو"><div class="wrap" id="navrow"><button id="loginBtn" type="button">🔐 تسجيل الدخول</button><button id="signupTop" type="button">إنشاء حساب</button><div id="tabs"></div></div></nav>
 <main><div class="wrap" id="menu"></div></main>
 <footer><div class="wrap">الأسعار بالجنيه المصري وتشمل الضريبة. لو عندك حساسية من أي مكوّن، اسأل الباريستا قبل الطلب.</div></footer>
 <button id="mgr" class="mgr" hidden>+ إضافة منتج</button>
@@ -136,7 +136,7 @@ function render(){
 }
 tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;active=b.dataset.id;render();window.scrollTo({top:0,behavior:"smooth"})});
 render();
-const dlg=document.getElementById("dlg"),loginDlg=document.getElementById("loginDlg"),loginBtn=document.getElementById("loginBtn"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
+const dlg=document.getElementById("dlg"),loginDlg=document.getElementById("loginDlg"),loginBtn=document.getElementById("loginBtn"),signupTop=document.getElementById("signupTop"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
 let editId=null;
 function openDlg(it){editId=it?it.id:null;$("dt").textContent=it?"تعديل المنتج":"إضافة منتج جديد";$("fc").value=it?it.cat:MENU[0].id;$("fn").value=it?it.name:"";$("fd").value=it&&it.desc?it.desc:"";$("fp").value=it?it.price:"";$("ft").value=it&&it.tag?it.tag:"";msg.textContent="";dlg.showModal();$("fn").focus()}
 async function loadMenu(){const {data,error}=await supabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
@@ -148,7 +148,7 @@ async function refreshAuth(){
  $("loginInfo").textContent=isMgr?"تم تسجيل الدخول بحساب المدير.":"سجّل الدخول بحساب المدير.";
  $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول"; $("signupAction").hidden=isMgr;
 }
-loginBtn.addEventListener("click",()=>{ $("loginMsg").textContent="";loginDlg.showModal();});
+loginBtn.addEventListener("click",()=>{ $("loginMsg").textContent=""; $("loginInfo").textContent="سجّل الدخول بحساب المدير."; $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول"; $("signupAction").hidden=isMgr; loginDlg.showModal();});\nsignupTop.addEventListener("click",()=>{ $("loginMsg").textContent=""; $("loginInfo").textContent="إنشاء حساب جديد بالبريد الإلكتروني وكلمة المرور."; $("signupAction").hidden=false; loginDlg.showModal();});
 async function authInputs(){
  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
  if(!email||!password){$("loginMsg").textContent="اكتب البريد الإلكتروني وكلمة المرور.";return null}
@@ -207,7 +207,7 @@ $("save").addEventListener("click",async()=>{
  if(error){msg.textContent="تعذّر الحفظ: "+error.message;return}
  editId=null;dlg.close();await loadMenu();
 });
-supabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول"});
+supabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول"});
 (async()=>{await refreshAuth();await loadMenu()})();
 </script>
 </body>
