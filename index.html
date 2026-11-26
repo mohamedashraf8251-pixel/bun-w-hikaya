@@ -165,10 +165,15 @@ menu.addEventListener("click",async e=>{
  const b=e.target.closest("[data-del]");if(!b||!isMgr)return;
  if(!b.classList.contains("sure")){b.classList.add("sure");b.textContent="تأكيد الحذف";return}
  const id=b.dataset.del;
- const payload=id.startsWith("o_")?{id,cat:flat.find(x=>x.id===id)?.cat,hidden:true}:{id};
- const {error}=await supabase.from("menu_items").delete().eq("id",id);
- if(error){b.textContent="تعذّر الحذف";alert(error.message);return}
- if(id.startsWith("o_")){const {error:upErr}=await supabase.from("menu_items").upsert({...payload});if(upErr)alert(upErr.message)}
+ if(id.startsWith("o_")){
+  const parts=id.split("_"),catId=parts[1],idx=Number(parts[2]),cat=MENU.find(x=>x.id===catId),base=cat?.items[idx];
+  if(!base){alert("المنتج الأصلي غير موجود");return}
+  const {error}=await supabase.from("menu_items").upsert({id,cat:catId,name:base[0],description:base[1],price:base[2],tag:base[3]||"",hidden:true});
+  if(error){b.textContent="تعذّر الحذف";alert(error.message);return}
+ }else{
+  const {error}=await supabase.from("menu_items").delete().eq("id",id);
+  if(error){b.textContent="تعذّر الحذف";alert(error.message);return}
+ }
  await loadMenu();
 });
 $("cancel").addEventListener("click",()=>dlg.close());
