@@ -68,7 +68,7 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 <main><div class="wrap" id="menu"></div></main>
 <footer><div class="wrap">الأسعار بالجنيه المصري وتشمل الضريبة. لو عندك حساسية من أي مكوّن، اسأل الباريستا قبل الطلب.</div></footer>
 <button id="mgr" class="mgr" hidden>+ إضافة منتج</button>
-<dialog id="loginDlg"><h3>تسجيل دخول المدير</h3><p id="loginInfo">اكتب بيانات حساب المدير.</p><label>البريد الإلكتروني<input id="loginEmail" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="loginPassword" type="password" autocomplete="current-password" required></label><p id="loginMsg" role="status"></p><div class="acts"><button id="loginAction" type="button">دخول</button><button id="loginClose" type="button">إغلاق</button></div></dialog>
+<dialog id="loginDlg"><h3>تسجيل دخول المدير</h3><p id="loginInfo">سجّل الدخول أو أنشئ حسابًا جديدًا.</p><label>البريد الإلكتروني<input id="loginEmail" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="loginPassword" type="password" autocomplete="current-password" required></label><p id="loginMsg" role="status"></p><div class="acts"><button id="loginAction" type="button">دخول</button><button id="signupAction" type="button">إنشاء حساب</button><button id="loginClose" type="button">إغلاق</button></div></dialog>
 <dialog id="dlg"><h3 id="dt">إضافة منتج جديد</h3>
 <label>القسم<select id="fc"></select></label>
 <label>اسم المنتج<input id="fn" maxlength="60"></label>
@@ -146,18 +146,35 @@ async function refreshAuth(){
  mbtn.hidden=!isMgr;
  loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول";
  $("loginInfo").textContent=isMgr?"تم تسجيل الدخول بحساب المدير.":"سجّل الدخول بحساب المدير.";
- $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول المدير";
+ $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول"; $("signupAction").hidden=isMgr;
 }
 loginBtn.addEventListener("click",()=>{ $("loginMsg").textContent="";loginDlg.showModal();});
+async function authInputs(){
+ const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
+ if(!email||!password){$("loginMsg").textContent="اكتب البريد الإلكتروني وكلمة المرور.";return null}
+ if(password.length<6){$("loginMsg").textContent="كلمة المرور لازم تكون 6 أحرف على الأقل.";return null}
+ return {email,password};
+}
 $("loginAction").addEventListener("click",async()=>{
  if(isMgr){await supabase.auth.signOut();await refreshAuth();loginDlg.close();return}
- const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
- if(!email||!password){$("loginMsg").textContent="اكتب البريد الإلكتروني وكلمة المرور.";return}
+ const values=await authInputs();if(!values)return;
  $("loginAction").disabled=true;
- const {error}=await supabase.auth.signInWithPassword({email,password});
- $("loginAction").disabled=false;
- $("loginMsg").textContent=error?"فشل تسجيل الدخول: "+error.message:"تم تسجيل الدخول بنجاح.";
- if(!error){await refreshAuth();loginDlg.close();await loadMenu();}
+ try{
+  const {error}=await supabase.auth.signInWithPassword(values);
+  $("loginMsg").textContent=error?"فشل تسجيل الدخول: "+error.message:"تم تسجيل الدخول بنجاح.";
+  if(!error){await refreshAuth();loginDlg.close();await loadMenu();}
+ }catch(err){$("loginMsg").textContent="حصل خطأ: "+err.message}
+ finally{$("loginAction").disabled=false}
+});
+$("signupAction").addEventListener("click",async()=>{
+ const values=await authInputs();if(!values)return;
+ $("signupAction").disabled=true;
+ try{
+  const {data,error}=await supabase.auth.signUp(values);
+  if(error){$("loginMsg").textContent="تعذّر إنشاء الحساب: "+error.message;return}
+  $("loginMsg").textContent=data.session?"تم إنشاء الحساب وتسجيل الدخول.":"تم إنشاء الحساب. لو تأكيد البريد مفعّل، راجع بريدك الإلكتروني لتأكيد الحساب.";
+ }catch(err){$("loginMsg").textContent="حصل خطأ: "+err.message}
+ finally{$("signupAction").disabled=false}
 });
 $("loginClose").addEventListener("click",()=>loginDlg.close());
 $("fc").innerHTML=MENU.map(c=>`<option value="${c.id}">${c.title}</option>`).join("");
