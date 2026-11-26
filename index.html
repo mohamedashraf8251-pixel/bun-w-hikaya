@@ -22,7 +22,8 @@ header p{margin:0;max-width:30em;font-size:1.1rem;opacity:.9}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;gap:8px;overflow-x:auto;padding:12px 24px;scrollbar-width:none}
 #navrow{align-items:center}
-#signupTop{font:inherit;font-weight:700;white-space:nowrap;cursor:pointer;background:transparent;color:var(--ink);border:1.5px solid var(--accent);border-radius:999px;padding:6px 14px}\n#loginBtn{font:inherit;font-weight:700;white-space:nowrap;cursor:pointer;background:var(--accent);color:var(--hero);border:0;border-radius:999px;padding:6px 16px}
+#signupTop{font:inherit;font-weight:700;white-space:nowrap;cursor:pointer;background:transparent;color:var(--ink);border:1.5px solid var(--accent);border-radius:999px;padding:6px 14px}
+#loginBtn{font:inherit;font-weight:700;white-space:nowrap;cursor:pointer;background:var(--accent);color:var(--hero);border:0;border-radius:999px;padding:6px 16px}
 #tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;flex:1}
 nav button{font:inherit;font-weight:500;white-space:nowrap;cursor:pointer;background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 18px}
 nav button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -148,7 +149,8 @@ async function refreshAuth(){
  $("loginInfo").textContent=isMgr?"تم تسجيل الدخول بحساب المدير.":"سجّل الدخول بحساب المدير.";
  $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول"; $("signupAction").hidden=isMgr;
 }
-loginBtn.addEventListener("click",()=>{ $("loginMsg").textContent=""; $("loginInfo").textContent="سجّل الدخول بحساب المدير."; $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول"; $("signupAction").hidden=isMgr; loginDlg.showModal();});\nsignupTop.addEventListener("click",()=>{ $("loginMsg").textContent=""; $("loginInfo").textContent="إنشاء حساب جديد بالبريد الإلكتروني وكلمة المرور."; $("signupAction").hidden=false; loginDlg.showModal();});
+loginBtn.addEventListener("click",()=>{ $("loginMsg").textContent=""; $("loginInfo").textContent="سجّل الدخول بحساب المدير."; $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول"; $("signupAction").hidden=isMgr; loginDlg.showModal();});
+signupTop.addEventListener("click",()=>{ $("loginMsg").textContent=""; $("loginInfo").textContent="إنشاء حساب جديد بالبريد الإلكتروني وكلمة المرور."; $("signupAction").hidden=false; loginDlg.showModal();});
 async function authInputs(){
  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
  if(!email||!password){$("loginMsg").textContent="اكتب البريد الإلكتروني وكلمة المرور.";return null}
