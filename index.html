@@ -68,7 +68,7 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 <main><div class="wrap" id="menu"></div></main>
 <footer><div class="wrap">الأسعار بالجنيه المصري وتشمل الضريبة. لو عندك حساسية من أي مكوّن، اسأل الباريستا قبل الطلب.</div></footer>
 <button id="mgr" class="mgr" hidden>+ إضافة منتج</button>
-<dialog id="loginDlg"><h3>تسجيل الدخول</h3><p id="loginInfo">سجّل الدخول بحسابك الأصلي للوصول إلى صلاحيات الإدارة.</p><p id="loginMsg" role="status"></p><div class="acts"><button id="loginAction">متابعة تسجيل الدخول</button><button id="loginClose">إغلاق</button></div></dialog>
+<dialog id="loginDlg"><h3>تسجيل دخول المدير</h3><p id="loginInfo">اكتب بيانات حساب المدير.</p><label>البريد الإلكتروني<input id="loginEmail" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="loginPassword" type="password" autocomplete="current-password" required></label><p id="loginMsg" role="status"></p><div class="acts"><button id="loginAction" type="button">دخول</button><button id="loginClose" type="button">إغلاق</button></div></dialog>
 <dialog id="dlg"><h3 id="dt">إضافة منتج جديد</h3>
 <label>القسم<select id="fc"></select></label>
 <label>اسم المنتج<input id="fn" maxlength="60"></label>
@@ -136,7 +136,7 @@ function render(){
 }
 tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;active=b.dataset.id;render();window.scrollTo({top:0,behavior:"smooth"})});
 render();
-const dlg=document.getElementById("dlg"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
+const dlg=document.getElementById("dlg"),loginDlg=document.getElementById("loginDlg"),loginBtn=document.getElementById("loginBtn"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
 let editId=null;
 function openDlg(it){editId=it?it.id:null;$("dt").textContent=it?"تعديل المنتج":"إضافة منتج جديد";$("fc").value=it?it.cat:MENU[0].id;$("fn").value=it?it.name:"";$("fd").value=it&&it.desc?it.desc:"";$("fp").value=it?it.price:"";$("ft").value=it&&it.tag?it.tag:"";msg.textContent="";dlg.showModal();$("fn").focus()}
 async function loadMenu(){const {data,error}=await supabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
@@ -151,9 +151,11 @@ async function refreshAuth(){
 loginBtn.addEventListener("click",()=>{ $("loginMsg").textContent="";loginDlg.showModal();});
 $("loginAction").addEventListener("click",async()=>{
  if(isMgr){await supabase.auth.signOut();await refreshAuth();loginDlg.close();return}
- const email=prompt("اكتب إيميل المدير:");if(!email)return;
- const password=prompt("اكتب كلمة المرور:");if(!password)return;
+ const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
+ if(!email||!password){$("loginMsg").textContent="اكتب البريد الإلكتروني وكلمة المرور.";return}
+ $("loginAction").disabled=true;
  const {error}=await supabase.auth.signInWithPassword({email,password});
+ $("loginAction").disabled=false;
  $("loginMsg").textContent=error?"فشل تسجيل الدخول: "+error.message:"تم تسجيل الدخول بنجاح.";
  if(!error){await refreshAuth();loginDlg.close();await loadMenu();}
 });
