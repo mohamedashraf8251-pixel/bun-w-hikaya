@@ -84,7 +84,7 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 <p id="msg" role="status"></p>
 <div class="acts"><button id="save">حفظ المنتج</button><button id="cancel">إلغاء</button></div></dialog>
 
-<script src="https://cdn.jsdelivr.net/npm/@window.__bunSupabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const MENU=[
 {id:"hot",title:"مشروبات ساخنة",note:"بنحضّرها على بن مختص من محمصتنا.",items:[
@@ -115,10 +115,10 @@ const MENU=[
 ["عجة بالجبنة","بيضتين مع جبنة وفلفل ألوان.",85],
 ["فول بالطحينة","الفطار المصري كما يجب، مع عيش بلدي.",65]]}
 ];
-const SUPABASE_URL="https://tblnzfdnqedmxckutvlc.window.__bunSupabase.co";
+const SUPABASE_URL="https://tblnzfdnqedmxckutvlc.supabase.co";
 const SUPABASE_KEY="sb_publishable_RoPsIDXJfjp0N9J0qjTobw_VV9TnnQu";
 const ADMIN_EMAIL="mohamedashraf8251@gmail.com";
-window.__bunSupabase=null;try{if(typeof window.window.__bunSupabase?.createClient==="function"){window.__bunSupabase=window.window.__bunSupabase.createClient(SUPABASE_URL,SUPABASE_KEY);}}catch(initError){console.warn("Supabase init skipped:",initError);}
+window.__bunSupabase=null;try{if(typeof window.supabase?.createClient==="function"){window.__bunSupabase=window.window.__bunSupabase.createClient(SUPABASE_URL,SUPABASE_KEY);}}catch(initError){console.warn("Supabase init skipped:",initError);}
 const tabs=document.getElementById("tabs"),menu=document.getElementById("menu");
 let active="all",extra=[],flat=[],isMgr=false,session=null,authMode="login";
 const nf=new Intl.NumberFormat("ar-EG");
