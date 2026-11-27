@@ -142,7 +142,7 @@ function render(){
 }
 tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;active=b.dataset.id;render();window.scrollTo({top:0,behavior:"smooth"})});
 render();
-const dlg=document.getElementById("dlg"),authPage=$("authPage"),loginBtn=document.getElementById("loginBtn"),signupTop=document.getElementById("signupTop"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
+const dlg=document.getElementById("dlg"),authPage=document.getElementById("authPage"),loginBtn=document.getElementById("loginBtn"),signupTop=document.getElementById("signupTop"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
 let editId=null;
 function openDlg(it){editId=it?it.id:null;$("dt").textContent=it?"تعديل المنتج":"إضافة منتج جديد";$("fc").value=it?it.cat:MENU[0].id;$("fn").value=it?it.name:"";$("fd").value=it&&it.desc?it.desc:"";$("fp").value=it?it.price:"";$("ft").value=it&&it.tag?it.tag:"";msg.textContent="";dlg.showModal();$("fn").focus()}
 async function loadMenu(){if(!supabase)return;const {data,error}=await supabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
@@ -162,8 +162,10 @@ function setAuthMode(mode){
  $("signupAction").textContent=mode==="signup"?"لدي حساب بالفعل":"إنشاء حساب";
  $("signupAction").hidden=isMgr;
 }
-loginBtn.addEventListener("click",()=>{setAuthMode("login");loginDlg.showModal();});
-signupTop.addEventListener("click",()=>{setAuthMode("signup");loginDlg.showModal();});
+function openAuthPage(mode){setAuthMode(mode);authPage.hidden=false;document.querySelector("header").hidden=true;document.querySelector("nav").hidden=true;document.querySelector("main").hidden=true;document.querySelector("footer").hidden=true;window.scrollTo(0,0);}
+function closeAuth(){authPage.hidden=true;document.querySelector("header").hidden=false;document.querySelector("nav").hidden=false;document.querySelector("main").hidden=false;document.querySelector("footer").hidden=false;window.scrollTo(0,0);}
+loginBtn.addEventListener("click",()=>openAuthPage("login"));
+signupTop.addEventListener("click",()=>openAuthPage("signup"));
 async function authInputs(){
  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
  if(!email||!password){$("loginMsg").textContent="اكتب البريد الإلكتروني وكلمة المرور.";return null}
@@ -171,7 +173,8 @@ async function authInputs(){
  return {email,password};
 }
 $("loginAction").addEventListener("click",async()=>{
- if(isMgr){await supabase.auth.signOut();await refreshAuth();loginDlg.close();return}
+ if(isMgr){if(!supabase){$("loginMsg").textContent="الاتصال بخدمة الحسابات غير متاح.";return}await supabase.auth.signOut();await refreshAuth();closeAuth();return}
+ if(!supabase){$("loginMsg").textContent="خدمة التسجيل لم تُحمّل. حدّث الصفحة أو جرّب لاحقًا.";return}
  const values=await authInputs();if(!values)return;
  $("loginAction").disabled=true;
  try{
@@ -189,7 +192,7 @@ $("loginAction").addEventListener("click",async()=>{
  finally{$("loginAction").disabled=false}
 });
 $("signupAction").addEventListener("click",()=>setAuthMode(authMode==="signup"?"login":"signup"));
-$("loginClose").addEventListener("click",()=>loginDlg.close());
+$("loginClose").addEventListener("click",closeAuth);
 $("fc").innerHTML=MENU.map(c=>`<option value="${c.id}">${c.title}</option>`).join("");
 mbtn.addEventListener("click",()=>{if(isMgr)openDlg(null)});
 menu.addEventListener("click",async e=>{
