@@ -118,7 +118,7 @@ const MENU=[
 const SUPABASE_URL="https://tblnzfdgedmxckutclc.supabase.co";
 const SUPABASE_KEY="sb_publishable_RoPsIDXJfjp0N9J0qjTobw_VV9TnnQu";
 const ADMIN_EMAIL="mohamedashraf8251@gmail.com";
-const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const supabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_KEY)||null;
 const tabs=document.getElementById("tabs"),menu=document.getElementById("menu");
 let active="all",extra=[],flat=[],isMgr=false,session=null,authMode="login";
 const nf=new Intl.NumberFormat("ar-EG");
@@ -145,7 +145,7 @@ render();
 const dlg=document.getElementById("dlg"),loginDlg=document.getElementById("loginDlg"),loginBtn=document.getElementById("loginBtn"),signupTop=document.getElementById("signupTop"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
 let editId=null;
 function openDlg(it){editId=it?it.id:null;$("dt").textContent=it?"تعديل المنتج":"إضافة منتج جديد";$("fc").value=it?it.cat:MENU[0].id;$("fn").value=it?it.name:"";$("fd").value=it&&it.desc?it.desc:"";$("fp").value=it?it.price:"";$("ft").value=it&&it.tag?it.tag:"";msg.textContent="";dlg.showModal();$("fn").focus()}
-async function loadMenu(){const {data,error}=await supabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
+async function loadMenu(){if(!supabase)return;const {data,error}=await supabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
 async function refreshAuth(){
  const {data}=await supabase.auth.getSession();session=data.session;
  isMgr=!!session&&session.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();
@@ -220,7 +220,7 @@ $("save").addEventListener("click",async()=>{
  if(error){msg.textContent="تعذّر الحفظ: "+error.message;return}
  editId=null;dlg.close();await loadMenu();
 });
-supabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول";$("signupAction").hidden=isMgr;});
+if(supabase)supabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول";$("signupAction").hidden=isMgr;});
 (async()=>{await refreshAuth();await loadMenu()})();
 </script>
 </body>
