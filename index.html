@@ -48,7 +48,7 @@ footer{background:var(--surface);border-top:1px solid var(--line);padding:28px 2
 .mgr[hidden]{display:none}
 .del{font:inherit;font-size:.8rem;cursor:pointer;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 8px}
 .del.sure{color:#B3261E;border-color:#B3261E}
-dialog{border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);width:min(440px,92vw);padding:22px;font-family:inherit;box-shadow:0 18px 50px rgba(0,0,0,.2)}
+.auth-page{min-height:75vh;display:flex;align-items:center;justify-content:center;padding:28px 16px}.auth-page[hidden]{display:none!important}.auth-card{width:min(460px,100%);padding:28px 22px;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 35px rgba(0,0,0,.08)}.auth-card h2{text-align:center;margin:8px 0}.auth-card>p{text-align:center;color:var(--muted)}.auth-brand{text-align:center;font-size:2.6rem}.auth-card label{display:block;font-weight:600;margin-top:14px}.auth-card input{display:block;width:100%;margin-top:5px;font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px}.auth-back{font:inherit;border:0;background:transparent;color:var(--muted);cursor:pointer}.auth-primary,.auth-switch{width:100%;font:inherit;font-weight:700;padding:12px;border-radius:10px;margin-top:12px;cursor:pointer}.auth-primary{background:var(--ink);color:var(--bg);border:1px solid var(--ink)}.auth-switch{background:transparent;color:var(--ink);border:1px solid var(--line)}dialog{border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);width:min(440px,92vw);padding:22px;font-family:inherit;box-shadow:0 18px 50px rgba(0,0,0,.2)}
 dialog::backdrop{background:rgba(0,0,0,.5)}
 dialog h3{font-family:"Reem Kufi",Tajawal,sans-serif;font-size:1.5rem;margin:0 0 10px}
 dialog label{display:block;font-weight:500;font-size:.95rem;margin-top:12px}
@@ -74,7 +74,7 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 <footer><div class="wrap">الأسعار بالجنيه المصري وتشمل الضريبة. لو عندك حساسية من أي مكوّن، اسأل الباريستا قبل الطلب.
 </div></footer>
 <button id="mgr" class="mgr" hidden>+ إضافة منتج</button>
-<dialog id="loginDlg"><h3>تسجيل دخول المدير</h3><p id="loginInfo">سجّل الدخول أو أنشئ حسابًا جديدًا.</p><label>البريد الإلكتروني<input id="loginEmail" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="loginPassword" type="password" autocomplete="current-password" required></label><p id="loginMsg" role="status"></p><div class="acts"><button id="loginAction" type="button">دخول</button><button id="signupAction" type="button">إنشاء حساب</button><button id="loginClose" type="button">إغلاق</button></div></dialog>
+<div id="authPage" class="auth-page" hidden><div class="auth-card"><button id="loginClose" class="auth-back" type="button">← رجوع للمنيو</button><div class="auth-brand">☕</div><h2 id="authTitle">تسجيل الدخول</h2><p id="loginInfo">سجّل الدخول أو أنشئ حسابًا جديدًا.</p><label>البريد الإلكتروني<input id="loginEmail" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="loginPassword" type="password" autocomplete="current-password" required></label><p id="loginMsg" role="status"></p><button id="loginAction" class="auth-primary" type="button">دخول</button><button id="signupAction" class="auth-switch" type="button">إنشاء حساب جديد</button></div></div>
 <dialog id="dlg"><h3 id="dt">إضافة منتج جديد</h3>
 <label>القسم<select id="fc"></select></label>
 <label>اسم المنتج<input id="fn" maxlength="60"></label>
@@ -142,7 +142,7 @@ function render(){
 }
 tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;active=b.dataset.id;render();window.scrollTo({top:0,behavior:"smooth"})});
 render();
-const dlg=document.getElementById("dlg"),loginDlg=document.getElementById("loginDlg"),loginBtn=document.getElementById("loginBtn"),signupTop=document.getElementById("signupTop"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
+const dlg=document.getElementById("dlg"),authPage=$("authPage"),loginBtn=document.getElementById("loginBtn"),signupTop=document.getElementById("signupTop"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
 let editId=null;
 function openDlg(it){editId=it?it.id:null;$("dt").textContent=it?"تعديل المنتج":"إضافة منتج جديد";$("fc").value=it?it.cat:MENU[0].id;$("fn").value=it?it.name:"";$("fd").value=it&&it.desc?it.desc:"";$("fp").value=it?it.price:"";$("ft").value=it&&it.tag?it.tag:"";msg.textContent="";dlg.showModal();$("fn").focus()}
 async function loadMenu(){if(!supabase)return;const {data,error}=await supabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
@@ -178,12 +178,12 @@ $("loginAction").addEventListener("click",async()=>{
   if(authMode==="signup"){
    const {data,error}=await supabase.auth.signUp(values);
    if(error){$("loginMsg").textContent="تعذّر إنشاء الحساب: "+error.message;return}
-   if(data.session){await refreshAuth();loginDlg.close();await loadMenu();}
+   if(data.session){await refreshAuth();closeAuth();await loadMenu();}
    else $("loginMsg").textContent="تم إنشاء الحساب. راجع بريدك لتأكيده إذا طُلب منك ذلك.";
   }else{
    const {error}=await supabase.auth.signInWithPassword(values);
    if(error){$("loginMsg").textContent="فشل تسجيل الدخول. راجع البريد وكلمة المرور.";return}
-   await refreshAuth();loginDlg.close();await loadMenu();
+   await refreshAuth();closeAuth();await loadMenu();
   }
  }catch(err){$("loginMsg").textContent="حصل خطأ، حاول مرة أخرى."}
  finally{$("loginAction").disabled=false}
