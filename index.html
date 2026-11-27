@@ -16,7 +16,7 @@ color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Tajawal,system-ui,sans-serif;font-size:17px;line-height:1.7}
-header{background:var(--hero);color:var(--hero-ink);padding:56px 24px 48px;text-align:right}
+header{background:linear-gradient(135deg,var(--hero),#24483D);color:var(--hero-ink);padding:56px 24px 48px;text-align:right;position:relative;overflow:hidden}header:after{content:"☕";position:absolute;left:-18px;bottom:-48px;font-size:clamp(8rem,25vw,16rem);opacity:.07;pointer-events:none}
 .wrap{max-width:760px;margin:0 auto}
 h1{font-family:"Reem Kufi",Tajawal,sans-serif;font-weight:700;font-size:clamp(3.2rem,13vw,6.5rem);line-height:1.05;margin:0 0 12px;color:var(--hero-accent)}
 header p{margin:0;max-width:30em;font-size:1.1rem;opacity:.9}
@@ -31,11 +31,11 @@ nav button{font:inherit;font-weight:500;white-space:nowrap;cursor:pointer;backgr
 nav button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 main{padding:12px 24px 72px}
-section{padding-top:36px}
+section{padding:26px 22px 8px;margin:20px 0;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 5px 18px rgba(0,0,0,.04);animation:rise .35s ease both}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 h2{font-family:"Reem Kufi",Tajawal,sans-serif;font-size:1.9rem;margin:0 0 4px}
 .note{color:var(--muted);margin:0 0 18px;font-size:.95rem}
 ul{list-style:none;margin:0;padding:0}
-li{padding:14px 0;border-bottom:1px solid var(--line)}
+li{padding:14px 0;border-bottom:1px solid var(--line)}li:last-child{border-bottom:0}
 .row{display:flex;align-items:baseline;gap:10px}
 .name{font-weight:700;font-size:1.12rem}
 .dots{flex:1;border-bottom:2px dotted var(--line);transform:translateY(-4px);min-width:16px}
@@ -48,7 +48,7 @@ footer{background:var(--surface);border-top:1px solid var(--line);padding:28px 2
 .mgr[hidden]{display:none}
 .del{font:inherit;font-size:.8rem;cursor:pointer;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 8px}
 .del.sure{color:#B3261E;border-color:#B3261E}
-dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);width:min(440px,92vw);padding:22px;font-family:inherit}
+dialog{border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);width:min(440px,92vw);padding:22px;font-family:inherit;box-shadow:0 18px 50px rgba(0,0,0,.2)}
 dialog::backdrop{background:rgba(0,0,0,.5)}
 dialog h3{font-family:"Reem Kufi",Tajawal,sans-serif;font-size:1.5rem;margin:0 0 10px}
 dialog label{display:block;font-weight:500;font-size:.95rem;margin-top:12px}
@@ -57,7 +57,7 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 .acts{display:flex;gap:10px;margin-top:18px}
 .acts button{font:inherit;font-weight:700;cursor:pointer;border-radius:8px;padding:8px 20px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg)}
 .acts #cancel{background:transparent;color:var(--ink)}
-#msg{min-height:1.4em;margin:10px 0 0;color:#B3261E;font-size:.9rem}
+#msg{min-height:1.4em;margin:10px 0 0;color:#B3261E;font-size:.9rem}\n@media(max-width:560px){header{padding:38px 20px 32px}main{padding:8px 14px 56px}section{padding:20px 14px 6px;margin:14px 0}nav .wrap{padding:10px 14px}.name{font-size:1rem}.mgr{padding:10px 18px}}\nbutton, .mgr{transition:transform .15s ease,filter .15s ease}button:hover,.mgr:hover{filter:brightness(1.05);transform:translateY(-1px)}
 
 
 </style>
@@ -120,7 +120,7 @@ const SUPABASE_KEY="sb_publishable_RoPsIDXJfjp0N9J0qjTobw_VV9TnnQu";
 const ADMIN_EMAIL="mohamedashraf8251@gmail.com";
 const supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const tabs=document.getElementById("tabs"),menu=document.getElementById("menu");
-let active="all",extra=[],flat=[],isMgr=false,session=null;
+let active="all",extra=[],flat=[],isMgr=false,session=null,authMode="login";
 const nf=new Intl.NumberFormat("ar-EG");
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function render(){
@@ -214,7 +214,7 @@ $("save").addEventListener("click",async()=>{
  if(error){msg.textContent="تعذّر الحفظ: "+error.message;return}
  editId=null;dlg.close();await loadMenu();
 });
-supabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول"});
+supabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول";$("signupAction").hidden=isMgr;});
 (async()=>{await refreshAuth();await loadMenu()})();
 </script>
 </body>
