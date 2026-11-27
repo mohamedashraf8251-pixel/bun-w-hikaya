@@ -118,7 +118,7 @@ const MENU=[
 const SUPABASE_URL="https://tblnzfdgedmxckutclc.supabase.co";
 const SUPABASE_KEY="sb_publishable_RoPsIDXJfjp0N9J0qjTobw_VV9TnnQu";
 const ADMIN_EMAIL="mohamedashraf8251@gmail.com";
-const supabase=window.supabase?.createClient(SUPABASE_URL,SUPABASE_KEY)||null;
+let supabase=null;try{if(typeof window.supabase?.createClient==="function"){supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}}catch(initError){console.warn("Supabase init skipped:",initError);}
 const tabs=document.getElementById("tabs"),menu=document.getElementById("menu");
 let active="all",extra=[],flat=[],isMgr=false,session=null,authMode="login";
 const nf=new Intl.NumberFormat("ar-EG");
