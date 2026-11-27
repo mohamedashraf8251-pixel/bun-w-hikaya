@@ -165,7 +165,7 @@ function setAuthMode(mode){
 }
 function openAuthPage(mode){setAuthMode(mode);authPage.hidden=false;document.querySelector("header").hidden=true;document.querySelector("nav").hidden=true;document.querySelector("main").hidden=true;document.querySelector("footer").hidden=true;window.scrollTo(0,0);}
 function closeAuth(){authPage.hidden=true;document.querySelector("header").hidden=false;document.querySelector("nav").hidden=false;document.querySelector("main").hidden=false;document.querySelector("footer").hidden=false;window.scrollTo(0,0);}
-loginBtn.addEventListener("click",()=>openAuthPage("login"));
+loginBtn.addEventListener("click",async()=>{if(isMgr){try{await window.__bunSupabase.auth.signOut();await refreshAuth();closeAuth();}catch(e){alert("تعذّر تسجيل الخروج، حاول مرة أخرى.");}}else openAuthPage("login");});
 signupTop.addEventListener("click",()=>openAuthPage("signup"));
 async function authInputs(){
  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
