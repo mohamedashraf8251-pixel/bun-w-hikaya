@@ -142,7 +142,8 @@ function render(){
 }
 tabs.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;active=b.dataset.id;render();window.scrollTo({top:0,behavior:"smooth"})});
 render();
-const dlg=document.getElementById("dlg"),authPage=document.getElementById("authPage"),loginBtn=document.getElementById("loginBtn"),signupTop=document.getElementById("signupTop"),mbtn=document.getElementById("mgr"),msg=document.getElementById("msg"),$=id=>document.getElementById(id);
+const $=id=>document.getElementById(id);
+const dlg=$("dlg"),authPage=$("authPage"),loginBtn=$("loginBtn"),signupTop=$("signupTop"),mbtn=$("mgr"),msg=$("msg");
 let editId=null;
 function openDlg(it){editId=it?it.id:null;$("dt").textContent=it?"تعديل المنتج":"إضافة منتج جديد";$("fc").value=it?it.cat:MENU[0].id;$("fn").value=it?it.name:"";$("fd").value=it&&it.desc?it.desc:"";$("fp").value=it?it.price:"";$("ft").value=it&&it.tag?it.tag:"";msg.textContent="";dlg.showModal();$("fn").focus()}
 async function loadMenu(){if(!supabase)return;const {data,error}=await supabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
