@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>بُن وحكاية – المينيو</title>
+<title>بُن وحكاية | منيو إلكتروني بتصميم عصري</title>
+<meta name="description" content="منيو إلكتروني لمقهى بُن وحكاية. تجربة تصميم موقع متجاوب وأنيق للمشروعات الصغيرة.">
+<meta name="theme-color" content="#17332B">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -56,6 +58,15 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 .acts button{font:inherit;font-weight:700;cursor:pointer;border-radius:8px;padding:8px 20px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg)}
 .acts #cancel{background:transparent;color:var(--ink)}
 #msg{min-height:1.4em;margin:10px 0 0;color:#B3261E;font-size:.9rem}
+
+.showcase{margin:34px 0 10px;padding:26px 22px;border:1px solid var(--line);border-radius:20px;background:linear-gradient(135deg,var(--surface),var(--bg));box-shadow:0 12px 28px rgba(12,35,25,.08)}
+.showcase .eyebrow{display:inline-block;color:var(--accent);font-weight:700;font-size:.88rem;margin-bottom:8px}
+.showcase h2{font-size:clamp(1.45rem,5vw,2rem);line-height:1.35}
+.showcase p{color:var(--muted);margin:8px 0 18px}
+.showcase .cta{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:var(--accent);color:var(--hero);font-weight:700;padding:11px 20px;border-radius:999px;transition:transform .18s ease,filter .18s ease}
+.showcase .cta:hover{transform:translateY(-2px);filter:brightness(1.04)}
+.showcase .small{font-size:.85rem;margin:12px 0 0}
+@media(max-width:480px){.showcase{padding:22px 18px}.showcase .cta{width:100%}}
 </style>
 </head>
 <body>
@@ -67,7 +78,8 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 
 <nav aria-label="أقسام المينيو"><div class="wrap" id="navrow"><button id="loginBtn" type="button">🔐 تسجيل الدخول</button><button id="signupTop" type="button">إنشاء حساب</button><div id="tabs"></div></div></nav>
 <main><div class="wrap" id="menu"></div></main>
-<footer><div class="wrap">الأسعار بالجنيه المصري وتشمل الضريبة. لو عندك حساسية من أي مكوّن، اسأل الباريستا قبل الطلب.</div></footer>
+<footer><div class="wrap">الأسعار بالجنيه المصري وتشمل الضريبة. لو عندك حساسية من أي مكوّن، اسأل الباريستا قبل الطلب.
+<section class="showcase" aria-label="تصميم موقع لمشروعك"><span class="eyebrow">موقع تجريبي بتصميم مخصص</span><h2>عجبك شكل الموقع؟ خلّي مشروعك له موقع بنفس الاحتراف ✨</h2><p>منيو إلكتروني، موقع تعريفي، صفحة لعرض خدماتك أو مشروعك. تصميم يناسب نشاطك، يعمل على الموبايل والكمبيوتر، وسهل التصفح.</p><a class="cta" href="https://www.fiverr.com/" target="_blank" rel="noopener noreferrer">اطلب تصميم موقعك على Fiverr</a><p class="small">اضغط وابدأ طلبك، واذكر نوع مشروعك والميزات اللي محتاجها.</p></section></div></footer>
 <button id="mgr" class="mgr" hidden>+ إضافة منتج</button>
 <dialog id="loginDlg"><h3>تسجيل دخول المدير</h3><p id="loginInfo">سجّل الدخول أو أنشئ حسابًا جديدًا.</p><label>البريد الإلكتروني<input id="loginEmail" type="email" autocomplete="username" required></label><label>كلمة المرور<input id="loginPassword" type="password" autocomplete="current-password" required></label><p id="loginMsg" role="status"></p><div class="acts"><button id="loginAction" type="button">دخول</button><button id="signupAction" type="button">إنشاء حساب</button><button id="loginClose" type="button">إغلاق</button></div></dialog>
 <dialog id="dlg"><h3 id="dt">إضافة منتج جديد</h3>
