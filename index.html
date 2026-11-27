@@ -151,7 +151,7 @@ async function refreshAuth(){
  const {data}=await window.__bunSupabase.auth.getSession();session=data.session;
  isMgr=!!session&&session.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();
  mbtn.hidden=!isMgr;
- loginBtn.textContent=isMgr?"👑 manager · تسجيل الخروج":"🔐 تسجيل الدخول";
+ loginBtn.textContent=isMgr?"manager · تسجيل الخروج":"🔐 تسجيل الدخول";
  $("loginInfo").textContent=isMgr?"تم تسجيل الدخول بحساب المدير.":"سجّل الدخول بحساب المدير.";
  $("loginAction").textContent=isMgr?"تسجيل الخروج":(authMode==="signup"?"إنشاء الحساب":"دخول"); $("signupAction").textContent=authMode==="signup"?"لدي حساب بالفعل":"إنشاء حساب"; $("signupAction").hidden=isMgr;signupTop.hidden=isMgr;
 }
@@ -224,7 +224,7 @@ $("save").addEventListener("click",async()=>{
  if(error){msg.textContent="تعذّر الحفظ: "+error.message;return}
  editId=null;dlg.close();await loadMenu();
 });
-if(window.__bunSupabase)window.__bunSupabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"👑 manager · تسجيل الخروج":"🔐 تسجيل الدخول";$("signupAction").hidden=isMgr;});
+if(window.__bunSupabase)window.__bunSupabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"manager · تسجيل الخروج":"🔐 تسجيل الدخول";$("signupAction").hidden=isMgr;});
 (async()=>{await refreshAuth();await loadMenu()})();
 </script>
 </body>
