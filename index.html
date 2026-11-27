@@ -152,10 +152,18 @@ async function refreshAuth(){
  mbtn.hidden=!isMgr;
  loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول";
  $("loginInfo").textContent=isMgr?"تم تسجيل الدخول بحساب المدير.":"سجّل الدخول بحساب المدير.";
- $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول"; $("signupAction").hidden=isMgr;signupTop.hidden=isMgr;
+ $("loginAction").textContent=isMgr?"تسجيل الخروج":(authMode==="signup"?"إنشاء الحساب":"دخول"); $("signupAction").textContent=authMode==="signup"?"لدي حساب بالفعل":"إنشاء حساب"; $("signupAction").hidden=isMgr;signupTop.hidden=isMgr;
 }
-loginBtn.addEventListener("click",()=>{ $("loginMsg").textContent=""; $("loginInfo").textContent="سجّل الدخول بحساب المدير."; $("loginAction").textContent=isMgr?"تسجيل الخروج":"دخول"; $("signupAction").hidden=isMgr; loginDlg.showModal();});
-signupTop.addEventListener("click",()=>{ $("loginMsg").textContent=""; $("loginInfo").textContent="إنشاء حساب جديد بالبريد الإلكتروني وكلمة المرور."; $("signupAction").hidden=false; loginDlg.showModal();});
+function setAuthMode(mode){
+ authMode=mode;
+ $("loginMsg").textContent="";
+ $("loginInfo").textContent=mode==="signup"?"إنشاء حساب جديد بالبريد الإلكتروني وكلمة المرور.":"سجّل الدخول بالبريد الإلكتروني وكلمة المرور.";
+ $("loginAction").textContent=mode==="signup"?"إنشاء الحساب":"دخول";
+ $("signupAction").textContent=mode==="signup"?"لدي حساب بالفعل":"إنشاء حساب";
+ $("signupAction").hidden=isMgr;
+}
+loginBtn.addEventListener("click",()=>{setAuthMode("login");loginDlg.showModal();});
+signupTop.addEventListener("click",()=>{setAuthMode("signup");loginDlg.showModal();});
 async function authInputs(){
  const email=$("loginEmail").value.trim(),password=$("loginPassword").value;
  if(!email||!password){$("loginMsg").textContent="اكتب البريد الإلكتروني وكلمة المرور.";return null}
@@ -167,22 +175,20 @@ $("loginAction").addEventListener("click",async()=>{
  const values=await authInputs();if(!values)return;
  $("loginAction").disabled=true;
  try{
-  const {error}=await supabase.auth.signInWithPassword(values);
-  $("loginMsg").textContent=error?"فشل تسجيل الدخول: "+error.message:"تم تسجيل الدخول بنجاح.";
-  if(!error){await refreshAuth();loginDlg.close();await loadMenu();}
- }catch(err){$("loginMsg").textContent="حصل خطأ: "+err.message}
+  if(authMode==="signup"){
+   const {data,error}=await supabase.auth.signUp(values);
+   if(error){$("loginMsg").textContent="تعذّر إنشاء الحساب: "+error.message;return}
+   if(data.session){await refreshAuth();loginDlg.close();await loadMenu();}
+   else $("loginMsg").textContent="تم إنشاء الحساب. راجع بريدك لتأكيده إذا طُلب منك ذلك.";
+  }else{
+   const {error}=await supabase.auth.signInWithPassword(values);
+   if(error){$("loginMsg").textContent="فشل تسجيل الدخول. راجع البريد وكلمة المرور.";return}
+   await refreshAuth();loginDlg.close();await loadMenu();
+  }
+ }catch(err){$("loginMsg").textContent="حصل خطأ، حاول مرة أخرى."}
  finally{$("loginAction").disabled=false}
 });
-$("signupAction").addEventListener("click",async()=>{
- const values=await authInputs();if(!values)return;
- $("signupAction").disabled=true;
- try{
-  const {data,error}=await supabase.auth.signUp(values);
-  if(error){$("loginMsg").textContent="تعذّر إنشاء الحساب: "+error.message;return}
-  $("loginMsg").textContent=data.session?"تم إنشاء الحساب وتسجيل الدخول.":"تم إنشاء الحساب. لو تأكيد البريد مفعّل، راجع بريدك الإلكتروني لتأكيد الحساب.";
- }catch(err){$("loginMsg").textContent="حصل خطأ: "+err.message}
- finally{$("signupAction").disabled=false}
-});
+$("signupAction").addEventListener("click",()=>setAuthMode(authMode==="signup"?"login":"signup"));
 $("loginClose").addEventListener("click",()=>loginDlg.close());
 $("fc").innerHTML=MENU.map(c=>`<option value="${c.id}">${c.title}</option>`).join("");
 mbtn.addEventListener("click",()=>{if(isMgr)openDlg(null)});
