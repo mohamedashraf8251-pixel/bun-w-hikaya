@@ -84,7 +84,7 @@ dialog input:focus-visible,dialog select:focus-visible{outline:3px solid var(--a
 <p id="msg" role="status"></p>
 <div class="acts"><button id="save">حفظ المنتج</button><button id="cancel">إلغاء</button></div></dialog>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@window.__bunSupabase/supabase-js@2"></script>
 <script>
 const MENU=[
 {id:"hot",title:"مشروبات ساخنة",note:"بنحضّرها على بن مختص من محمصتنا.",items:[
@@ -115,10 +115,10 @@ const MENU=[
 ["عجة بالجبنة","بيضتين مع جبنة وفلفل ألوان.",85],
 ["فول بالطحينة","الفطار المصري كما يجب، مع عيش بلدي.",65]]}
 ];
-const SUPABASE_URL="https://tblnzfdnqedmxckutvlc.supabase.co";
+const SUPABASE_URL="https://tblnzfdnqedmxckutvlc.window.__bunSupabase.co";
 const SUPABASE_KEY="sb_publishable_RoPsIDXJfjp0N9J0qjTobw_VV9TnnQu";
 const ADMIN_EMAIL="mohamedashraf8251@gmail.com";
-let supabase=null;try{if(typeof window.supabase?.createClient==="function"){supabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}}catch(initError){console.warn("Supabase init skipped:",initError);}
+window.__bunSupabase=null;try{if(typeof window.window.__bunSupabase?.createClient==="function"){window.__bunSupabase=window.window.__bunSupabase.createClient(SUPABASE_URL,SUPABASE_KEY);}}catch(initError){console.warn("Supabase init skipped:",initError);}
 const tabs=document.getElementById("tabs"),menu=document.getElementById("menu");
 let active="all",extra=[],flat=[],isMgr=false,session=null,authMode="login";
 const nf=new Intl.NumberFormat("ar-EG");
@@ -146,9 +146,9 @@ const $=id=>document.getElementById(id);
 const dlg=$("dlg"),authPage=$("authPage"),loginBtn=$("loginBtn"),signupTop=$("signupTop"),mbtn=$("mgr"),msg=$("msg");
 let editId=null;
 function openDlg(it){editId=it?it.id:null;$("dt").textContent=it?"تعديل المنتج":"إضافة منتج جديد";$("fc").value=it?it.cat:MENU[0].id;$("fn").value=it?it.name:"";$("fd").value=it&&it.desc?it.desc:"";$("fp").value=it?it.price:"";$("ft").value=it&&it.tag?it.tag:"";msg.textContent="";dlg.showModal();$("fn").focus()}
-async function loadMenu(){if(!supabase)return;const {data,error}=await supabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
+async function loadMenu(){if(!window.__bunSupabase)return;const {data,error}=await window.__bunSupabase.from("menu_items").select("*");if(error){console.error(error);return}extra=data||[];render()}
 async function refreshAuth(){
- const {data}=await supabase.auth.getSession();session=data.session;
+ const {data}=await window.__bunSupabase.auth.getSession();session=data.session;
  isMgr=!!session&&session.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();
  mbtn.hidden=!isMgr;
  loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول";
@@ -174,18 +174,18 @@ async function authInputs(){
  return {email,password};
 }
 $("loginAction").addEventListener("click",async()=>{
- if(isMgr){if(!supabase){$("loginMsg").textContent="الاتصال بخدمة الحسابات غير متاح.";return}await supabase.auth.signOut();await refreshAuth();closeAuth();return}
- if(!supabase){$("loginMsg").textContent="خدمة التسجيل لم تُحمّل. حدّث الصفحة أو جرّب لاحقًا.";return}
+ if(isMgr){if(!window.__bunSupabase){$("loginMsg").textContent="الاتصال بخدمة الحسابات غير متاح.";return}await window.__bunSupabase.auth.signOut();await refreshAuth();closeAuth();return}
+ if(!window.__bunSupabase){$("loginMsg").textContent="خدمة التسجيل لم تُحمّل. حدّث الصفحة أو جرّب لاحقًا.";return}
  const values=await authInputs();if(!values)return;
  $("loginAction").disabled=true;
  try{
   if(authMode==="signup"){
-   const {data,error}=await supabase.auth.signUp(values);
+   const {data,error}=await window.__bunSupabase.auth.signUp(values);
    if(error){$("loginMsg").textContent="تعذّر إنشاء الحساب: "+error.message;return}
    if(data.session){await refreshAuth();closeAuth();await loadMenu();}
    else $("loginMsg").textContent="تم إنشاء الحساب. راجع بريدك لتأكيده إذا طُلب منك ذلك.";
   }else{
-   const {error}=await supabase.auth.signInWithPassword(values);
+   const {error}=await window.__bunSupabase.auth.signInWithPassword(values);
    if(error){$("loginMsg").textContent="فشل تسجيل الدخول. راجع البريد وكلمة المرور.";return}
    await refreshAuth();closeAuth();await loadMenu();
   }
@@ -204,10 +204,10 @@ menu.addEventListener("click",async e=>{
  if(id.startsWith("o_")){
   const parts=id.split("_"),catId=parts[1],idx=Number(parts[2]),cat=MENU.find(x=>x.id===catId),base=cat?.items[idx];
   if(!base){alert("المنتج الأصلي غير موجود");return}
-  const {error}=await supabase.from("menu_items").upsert({id,cat:catId,name:base[0],description:base[1],price:base[2],tag:base[3]||"",hidden:true});
+  const {error}=await window.__bunSupabase.from("menu_items").upsert({id,cat:catId,name:base[0],description:base[1],price:base[2],tag:base[3]||"",hidden:true});
   if(error){b.textContent="تعذّر الحذف";alert(error.message);return}
  }else{
-  const {error}=await supabase.from("menu_items").delete().eq("id",id);
+  const {error}=await window.__bunSupabase.from("menu_items").delete().eq("id",id);
   if(error){b.textContent="تعذّر الحذف";alert(error.message);return}
  }
  await loadMenu();
@@ -220,11 +220,11 @@ $("save").addEventListener("click",async()=>{
  if(!(price>=0)){msg.textContent="اكتب السعر بالأرقام.";return}
  const id=editId||"i"+Date.now().toString(36);
  const row={id,cat:$("fc").value,name,description:$("fd").value.trim(),price,tag:$("ft").value.trim(),hidden:false};
- const {error}=await supabase.from("menu_items").upsert(row);
+ const {error}=await window.__bunSupabase.from("menu_items").upsert(row);
  if(error){msg.textContent="تعذّر الحفظ: "+error.message;return}
  editId=null;dlg.close();await loadMenu();
 });
-if(supabase)supabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول";$("signupAction").hidden=isMgr;});
+if(window.__bunSupabase)window.__bunSupabase.auth.onAuthStateChange((_event,s)=>{session=s;isMgr=!!s&&s.user.email?.toLowerCase()===ADMIN_EMAIL.toLowerCase();mbtn.hidden=!isMgr;signupTop.hidden=isMgr;loginBtn.textContent=isMgr?"👑 المدير · تسجيل الخروج":"🔐 تسجيل الدخول";$("signupAction").hidden=isMgr;});
 (async()=>{await refreshAuth();await loadMenu()})();
 </script>
 </body>
